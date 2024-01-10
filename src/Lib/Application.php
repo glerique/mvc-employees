@@ -2,9 +2,6 @@
 
 namespace App\Lib;
 
-use Error;
-
-
 class Application
 {
     /** 
@@ -13,23 +10,24 @@ class Application
     public static function start()
     {
         session_start();
-
+        $uri = $_SERVER['REQUEST_URI'];
+        
         $params = [];
-        if (empty($_GET['p'])) {
-            $params = explode('/', $_GET['p']);
+        
+            $params = explode('/', $uri);
 
-            if (!empty($params[0])) {
-                $controllerName = ucfirst($params[0]);
+            if (!empty($params[2])) {
+                $controllerName = ucfirst($params[2]);
             } else {
                 $controllerName = "Employee";
-            }
+            }            
 
-            if (!empty($params[1])) {
-                $action = $params[1];
+            if (!empty($params[3])) {
+                $action = $params[3];
             } else {
                 $action = "index";
             }
-
+            
             $path = "src/Controller/" . $controllerName . "Controller.php";
 
             if (!file_exists($path)) {
@@ -48,14 +46,13 @@ class Application
                 Http::redirect("/mvc-employees/");
             }
 
-            if (!empty($params[2])) {
+            if (!empty($params[4])) {
                 //try{$controller->$action($params[2]);}  catch (Error $e){echo 'marche pas';}     
-                $_GET['id'] = (int)$params[2];
+                $_GET['id'] = (int)$params[4];
                 $controller->$action();
             } else {
                 $_GET['id'] = (int)1;
                 $controller->$action();
-            }
-        }
+            }        
     }
 }
