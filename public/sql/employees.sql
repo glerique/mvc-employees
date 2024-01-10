@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.5deb2
+-- version 5.1.1deb5ubuntu1
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : lun. 03 mai 2021 à 15:00
--- Version du serveur :  8.0.23-0ubuntu0.20.04.1
--- Version de PHP : 7.4.3
+-- Généré le : jeu. 04 jan. 2024 à 15:26
+-- Version du serveur : 8.0.35-0ubuntu0.22.04.1
+-- Version de PHP : 8.3.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -25,6 +24,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `departement`
+--
+
+CREATE TABLE `departement` (
+  `id` int NOT NULL,
+  `name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `departement`
+--
+
+INSERT INTO `departement` (`id`, `name`) VALUES
+(1, 'Informatique'),
+(2, 'Commercial'),
+(3, 'Comptable');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `employee`
 --
 
@@ -35,38 +54,44 @@ CREATE TABLE `employee` (
   `birth_date` date NOT NULL,
   `hire_date` date NOT NULL,
   `salary` int NOT NULL DEFAULT '0',
-  `departement` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
+  `departementId` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `employee`
 --
 
-INSERT INTO `employee` (`id`, `last_name`, `first_name`, `birth_date`, `hire_date`, `salary`, `departement`) VALUES
-(1, 'Cuset', 'Jean', '1966-06-02', '1995-05-15', 2400, 'informatique'),
-(2, 'Dian', 'Charles', '1972-08-30', '2007-04-01', 1800, 'commercial'),
-(3, 'Paco', 'Alain', '1958-04-25', '2002-06-06', 2100, 'commercial'),
-(4, 'Perez', 'Amanda', '1972-01-11', '1999-03-11', 1700, 'comptable'),
-(5, 'Jeanu', 'Thierry', '1970-07-11', '1998-01-01', 1600, 'comptable'),
-(6, 'Taque', 'Stephane', '1965-04-08', '2008-02-01', 2000, 'informatique'),
-(7, 'Devos', 'Yahn', '1965-07-08', '2009-02-01', 2400, 'informatique'),
-(8, 'Tettu', 'Sylvain', '1975-07-11', '2006-02-01', 2000, 'comptable'),
-(9, 'Triet', 'Jacques', '1968-11-08', '2005-10-01', 3000, 'informatique'),
-(10, 'Jolivet', 'Olivier', '1973-02-23', '2000-11-06', 1800, 'commercial'),
-(11, 'Jollet', 'Marc', '1965-04-28', '1999-02-01', 4000, 'informatique'),
-(12, 'Milan', 'Adrien', '1980-04-08', '2008-02-01', 2000, 'commercial'),
-(13, 'Cerceau', 'Gilles', '1975-03-18', '2008-02-01', 2000, 'informatique'),
-(14, 'Tuche', 'Yves', '1965-04-08', '2006-02-01', 2000, 'commercial'),
-(15, 'Trichet', 'Antoine', '1978-11-08', '2006-02-01', 1600, 'informatique'),
-(16, 'Alan', 'Steven', '1976-01-21', '2006-02-01', 2800, 'informatique'),
-(17, 'Dilou', 'Tristan', '1978-01-18', '2006-02-01', 2500, 'informatique'),
-(18, 'Jaspe', 'Anouk', '1980-04-08', '2008-02-01', 2000, 'comptable'),
-(19, 'Anvers', 'Tonio', '1967-06-06', '2008-02-01', 2400, 'comptable'),
-(20, 'Clouzot', 'Edouard', '1955-04-08', '1998-02-01', 5000, 'commercial');
+INSERT INTO `employee` (`id`, `last_name`, `first_name`, `birth_date`, `hire_date`, `salary`, `departementId`) VALUES
+(1, 'Cuset', 'Jean', '1966-06-02', '1995-05-15', 2400, '1'),
+(2, 'Dian', 'Charles', '1972-08-30', '2007-04-01', 1800, '1'),
+(3, 'Paco', 'Alain', '1958-04-25', '2002-06-06', 2100, '2'),
+(4, 'Perez', 'Amanda', '1972-01-11', '1999-03-11', 1700, '1'),
+(5, 'Jeanu', 'Thierry', '1970-07-11', '1998-01-01', 1600, '2'),
+(6, 'Taque', 'Stephane', '1965-04-08', '2008-02-01', 2000, '2'),
+(7, 'Devos', 'Yahn', '1965-07-08', '2009-02-01', 2400, '1'),
+(8, 'Tettu', 'Sylvain', '1975-07-11', '2006-02-01', 2000, '2'),
+(9, 'Triet', 'Jacques', '1968-11-08', '2005-10-01', 3000, '1'),
+(10, 'Jolivet', 'Olivier', '1973-02-23', '2000-11-06', 1800, '1'),
+(11, 'Jollet', 'Marc', '1965-04-28', '1999-02-01', 4000, '2'),
+(12, 'Milan', 'Adrien', '1980-04-08', '2008-02-01', 2000, '3'),
+(13, 'Cerceau', 'Gilles', '1975-03-18', '2008-02-01', 2000, '3'),
+(14, 'Tuche', 'Yves', '1965-04-08', '2006-02-01', 2000, '3'),
+(15, 'Trichet', 'Antoine', '1978-11-08', '2006-02-01', 1600, '3'),
+(16, 'Alan', 'Steven', '1976-01-21', '2006-02-01', 2800, '1'),
+(17, 'Dilou', 'Tristan', '1978-01-18', '2006-02-01', 2500, '1'),
+(18, 'Jaspe', 'Anouk', '1980-04-08', '2008-02-01', 2000, '1'),
+(19, 'Anvers', 'Tonio', '1967-06-06', '2008-02-01', 2400, '1'),
+(20, 'Clouzot', 'Edouard', '1955-04-08', '1998-02-01', 5000, '2');
 
 --
 -- Index pour les tables déchargées
 --
+
+--
+-- Index pour la table `departement`
+--
+ALTER TABLE `departement`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `employee`
@@ -79,10 +104,16 @@ ALTER TABLE `employee`
 --
 
 --
+-- AUTO_INCREMENT pour la table `departement`
+--
+ALTER TABLE `departement`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT pour la table `employee`
 --
 ALTER TABLE `employee`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

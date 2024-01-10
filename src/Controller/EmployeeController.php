@@ -26,7 +26,7 @@ class EmployeeController extends Controller
         if (!$id or !is_int($id)) {
             $this->redirect(
                 "/mvc-employees/employee/index/1"
-
+                
             );
         }
 

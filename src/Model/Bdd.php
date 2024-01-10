@@ -16,7 +16,7 @@ class Bdd
         $params = [
             'host' => 'localhost',
             'dbname' => 'employees',
-            'username' => 'root',
+            'username' => 'admin',
             'password' => 'test'
         ];
 
