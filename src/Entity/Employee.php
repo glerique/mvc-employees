@@ -14,6 +14,7 @@ class Employee
     private $hire_date;
     private $salary;
     private $departementId;
+    private $departement;
     
    /* 
     public function hydrate(array $donnees)
@@ -78,12 +79,11 @@ class Employee
     {
         return $this->departementId;
     }
-/*
+
     public function getDepartement()
         {
             return $this->departement;
-        }
- */   
+        } 
 
 
     /**
@@ -131,11 +131,10 @@ class Employee
         $this->departementId = $departementId;
         return $departementId;
     }
-/*
+
     public function setDepartement($departement)
     {
         $this->departement = $departement;
         return $departement;
-    }
-*/    
+    }    
 }
