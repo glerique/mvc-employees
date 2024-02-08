@@ -49,10 +49,10 @@ INSERT INTO `departement` (`id`, `name`) VALUES
 
 CREATE TABLE `employee` (
   `id` int NOT NULL,
-  `last_name` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
-  `first_name` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
-  `birth_date` date NOT NULL,
-  `hire_date` date NOT NULL,
+  `lastName` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `firstName` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT '',
+  `birthDate` date NOT NULL,
+  `hireDate` date NOT NULL,
   `salary` int NOT NULL DEFAULT '0',
   `departementId` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -61,7 +61,7 @@ CREATE TABLE `employee` (
 -- Déchargement des données de la table `employee`
 --
 
-INSERT INTO `employee` (`id`, `last_name`, `first_name`, `birth_date`, `hire_date`, `salary`, `departementId`) VALUES
+INSERT INTO `employee` (`id`, `lastName`, `firstName`, `birthDate`, `hireDate`, `salary`, `departementId`) VALUES
 (1, 'Cuset', 'Jean', '1966-06-02', '1995-05-15', 2400, '1'),
 (2, 'Dian', 'Charles', '1972-08-30', '2007-04-01', 1800, '1'),
 (3, 'Paco', 'Alain', '1958-04-25', '2002-06-06', 2100, '2'),
