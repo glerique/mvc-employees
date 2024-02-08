@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use DateTime;
+use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
 use App\Entity\Employee;
@@ -10,14 +10,13 @@ use App\Controller\Controller;
 use App\Model\EmployeeManager;
 use App\Model\DepartementManager;
 
-
 class EmployeeController extends Controller
 {
     private $model;
 
-    public function __construct()
+    public function __construct(EmployeeManager $employeeManager)
     {
-        $this->model = new EmployeeManager();
+        $this->model = $employeeManager;
     }
 
     public function index()
@@ -25,8 +24,7 @@ class EmployeeController extends Controller
         $id = $_GET['id'];
         if (!$id or !is_int($id)) {
             $this->redirect(
-                "/mvc-employees/employee/index/1"
-                
+                "/mvc-employees/employee/index/1"                
             );
         }
 
@@ -48,7 +46,7 @@ class EmployeeController extends Controller
 
     public function show()
     {
-        $id = $_GET['id'];
+        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT); 
         if (!$id or !is_int($id)) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
@@ -68,35 +66,52 @@ class EmployeeController extends Controller
 
     public function newView()
     {
-        $departementManager = new DepartementManager();
+        $db = new Database;
+        $departementManager = new DepartementManager($db);
         $departements = $departementManager->findAll();
         Renderer::render("employee/nouveau", compact('departements'));
     }
 
     public function new()
     {
-        $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_SPECIAL_CHARS);
-        $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_SPECIAL_CHARS);
-        $birth_date = filter_input(INPUT_POST, 'birth_date', FILTER_SANITIZE_SPECIAL_CHARS);
-        $hire_date = filter_input(INPUT_POST, 'hire_date', FILTER_SANITIZE_SPECIAL_CHARS);
+        $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);
+        $hireDate = filter_input(INPUT_POST, 'hireDate', FILTER_SANITIZE_SPECIAL_CHARS);
         $salary = filter_input(INPUT_POST, 'salary', FILTER_SANITIZE_SPECIAL_CHARS);
         $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if (!$last_name || !$first_name || !$birth_date || !$hire_date || !$salary || !$departementId) {
+        if (!$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
             $this->redirectWithError(
                 "/mvc-employees/employee/new",
                 "Merci de bien remplir le formulaire"
             );
         }
+/*
+        $id = $this->getPostData('id', FILTER_VALIDATE_INT);
+        $formData = [
+            'lastName' => $this->getPostData('lastName'),
+            'firstName' => $this->getPostData('firstName'),
+            'birthDate' => $this->getPostData('birthDate'),
+            'hireDate' => $this->getPostData('hireDate'),
+            'salary' => $this->getPostData('salary'),
+            'departementId' => $this->getPostData('departementId'),
+        ];
+        
+        if (!$id || in_array(null, $formData, true)) {
+            $this->handleError("/mvc-employees/employee/new", "Merci de bien remplir le formulaire !");
+        }
+*/       
+        $manager = $this->model;        
+        $employee = new Employee([
+            'lastName' => $lastName,
+            'firstName' => $firstName,
+            'birthDate' => $birthDate,
+            'hireDate' => $hireDate,
+            'salary' => $salary,
+            'departementId' => $departementId
+        ]);  
 
-        $manager = $this->model;
-        $employee = new Employee;
-        $employee->setLastname($last_name);
-        $employee->setFirstName($first_name);
-        $employee->setBirthDate(new DateTime($birth_date));
-        $employee->setHireDate(new DateTime($hire_date));
-        $employee->setSalary($salary);
-        $employee->setDepartementId($departementId);
         $manager->add($employee);
 
         $this->redirectWithSuccess(
@@ -107,7 +122,7 @@ class EmployeeController extends Controller
 
     public function editView()
     {
-        $id = $_GET['id'];
+        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT); 
         if (!$id or !is_int($id)) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
@@ -115,7 +130,8 @@ class EmployeeController extends Controller
             );
         }
         $manager = $this->model;
-        $departementManager = new DepartementManager();
+        $db = new Database;
+        $departementManager = new DepartementManager($db);
         $employee = $manager->findById($id);
         if (!$employee) {
             $this->redirectWithError(
@@ -130,14 +146,14 @@ class EmployeeController extends Controller
     public function edit()
     {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-        $last_name = filter_input(INPUT_POST, 'last_name', FILTER_SANITIZE_SPECIAL_CHARS);
-        $first_name = filter_input(INPUT_POST, 'first_name', FILTER_SANITIZE_SPECIAL_CHARS);
-        $birth_date = filter_input(INPUT_POST, 'birth_date', FILTER_SANITIZE_SPECIAL_CHARS);;
-        $hire_date = filter_input(INPUT_POST, 'hire_date', FILTER_SANITIZE_SPECIAL_CHARS);
+        $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);;
+        $hireDate = filter_input(INPUT_POST, 'hireDate', FILTER_SANITIZE_SPECIAL_CHARS);
         $salary = filter_input(INPUT_POST, 'salary', FILTER_SANITIZE_SPECIAL_CHARS);
         $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        if (!$id || !$last_name || !$first_name || !$birth_date || !$hire_date || !$salary || !$departementId) {
+        if (!$id || !$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
             $this->redirectWithError(
                 "/mvc-employees/employee/new",
                 "Merci de bien remplir le formulaire !"
@@ -145,14 +161,15 @@ class EmployeeController extends Controller
         }
 
         $manager = $this->model;
-        $employee = new Employee;
-        $employee->setId($id);
-        $employee->setLastName($last_name);
-        $employee->setFirstName($first_name);
-        $employee->setBirthDate(new DateTime($birth_date));
-        $employee->setHireDate(new DateTime($hire_date));
-        $employee->setSalary($salary);
-        $employee->setDepartementId($departementId);
+        $employee = new Employee([
+            'id' => $id,
+            'lastName' => $lastName,
+            'firstName' => $firstName,
+            'birthDate' => $birthDate,
+            'hireDate' => $hireDate,
+            'salary' => $salary,
+            'departementId' => $departementId
+        ]);  
         $manager->update($employee);
 
         $this->redirectWithSuccess(
@@ -163,7 +180,7 @@ class EmployeeController extends Controller
 
     public function delete()
     {
-        $id = $_GET['id'];
+        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT); 
         if (!$id or !is_int($id)) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
