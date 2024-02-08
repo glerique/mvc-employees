@@ -1,24 +1,16 @@
 <?php
 
 namespace App\Entity;
+use App\Entity\Entity;
 
-
-class Departement
-{
-
-    private $id;
-    private $name;
-
-
+class Departement extends Entity
+{    
+    private $name;    
 
     /**
      * Getters
      */
-    public function getId()
-    {
-        return $this->id;
-    }
-
+    
     public function getName()
     {
         return $this->name;
@@ -27,12 +19,7 @@ class Departement
 
     /**
      * Setters
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $id;
-    }
+     */    
 
     public function setName($name)
     {

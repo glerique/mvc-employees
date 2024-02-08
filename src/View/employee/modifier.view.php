@@ -16,22 +16,22 @@
             </div>            
             <div class="col-12">
               <div class="form-group">
-                Nom : <input class="form-control" type="text" name="last_name" value="<?= $employee->getLastName(); ?>">
+                Nom : <input class="form-control" type="text" name="lastName" value="<?= $employee->getLastName(); ?>">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Prénom : <input class="form-control" type="text" name="first_name" value="<?= $employee->getFirstName(); ?>">
+                Prénom : <input class="form-control" type="text" name="firstName" value="<?= $employee->getFirstName(); ?>">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Date de naissance : <input class="form-control" type="date" name="birth_date"value="<?= $employee->getBirthDate(); ?>">
+                Date de naissance de toto : <input class="form-control" type="date" name="birthDate" value="<?= $employee->getBirthDate()->format('Y-m-d'); ?>">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Date d'embauche : <input class="form-control" type="date" name="hire_date" value="<?= $employee->getHireDate(); ?>">
+                Date d'embauche : <input class="form-control" type="date" name="hireDate" value="<?= $employee->getHireDate()->format('Y-m-d'); ?>">
               </div>
             </div>
             <div class="col-12">
@@ -41,7 +41,7 @@
             </div>
              <div class="col-12">
             <div class="form-group">
-                <label for="service">Services : </label>
+                Services :
                 <select class="form-control" name ="departementId">
                 <?php 
                 foreach ($departements as $departement){ ?>

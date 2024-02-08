@@ -3,25 +3,24 @@
 namespace App\Model;
 
 use PDO;
-use App\Model\Bdd;
+use App\Lib\Database;
 
-abstract class Model
+class Model
 {
 
     protected $db;
     protected $table;
     protected $class;
     protected $objet;
+       
 
-    public function __construct()
-    {
-        $this->db = Bdd::dbConnect();
+    public function __construct($db)
+    {        
+        $this->db = $db->getPdo(); 
     }
 
-
-
     public function count()
-    {
+    {        
         $query = $this->db->prepare("SELECT COUNT(*) FROM $this->table");
         $query->execute();
         return $query->fetchColumn();

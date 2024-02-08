@@ -11,22 +11,22 @@
           <div class="row">
             <div class="col-12">
               <div class="form-group">
-                Nom : <input class="form-control" type="text" name="last_name">
+                Nom : <input class="form-control" type="text" name="lastName">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Prénom : <input class="form-control" type="text" name="first_name">
+                Prénom : <input class="form-control" type="text" name="firstName">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Date de naissance : <input class="form-control" type="date" name="birth_date">
+                Date de naissance : <input class="form-control" type="date" name="birthDate">
               </div>
             </div>
             <div class="col-12">
               <div class="form-group">
-                Date d'embauche : <input class="form-control" type="date" name="hire_date">
+                Date d'embauche : <input class="form-control" type="date" name="hireDate">
               </div>
             </div>
             <div class="col-12">

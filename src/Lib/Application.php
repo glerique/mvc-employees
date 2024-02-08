@@ -2,6 +2,8 @@
 
 namespace App\Lib;
 
+use App\Lib\Database;
+
 class Application
 {
     /** 
@@ -29,7 +31,9 @@ class Application
             }
             
             $path = "src/Controller/" . $controllerName . "Controller.php";
-
+            $managerName = "App\Model\\" . $controllerName . "Manager";
+            $db = new Database;          
+            $manager = new $managerName($db);
             if (!file_exists($path)) {
                 // Si le controller n'existe pas, on affiche une erreur :
                 Session::addFlash('error', "Le controller que vous avez demandé n'existe pas !");
@@ -37,8 +41,8 @@ class Application
             }
 
             $controllerName = "App\Controller\\" . $controllerName . "Controller";
-
-            $controller = new $controllerName();
+            
+            $controller = new $controllerName($manager);
 
             if (!method_exists($controller, $action)) {
                 // Si le controller ne connait pas de method pour cette action, on affiche une erreur
