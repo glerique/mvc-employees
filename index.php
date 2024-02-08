@@ -1,5 +1,6 @@
 <?php
-require 'vendor/autoload.php';
+require_once 'vendor/autoload.php';
+require_once 'config/config.php';
 
 use App\Lib\Application;
 /** Pour afficher les erreur en Dev */
