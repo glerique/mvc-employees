@@ -10,14 +10,12 @@ class Pagination
 
     public function __construct($total, int $perPage = 10)
     {
-
         $this->total = $total;
         $this->perPage = $perPage;
     }
 
     public function getPerPage()
     {
-
         return $this->perPage;
     }
 
