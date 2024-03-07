@@ -2,7 +2,8 @@
 
 namespace App\Entity;
 
-class Entity{
+class Entity
+{
 
     protected $id;
 
@@ -35,6 +36,6 @@ class Entity{
 
     public function setId($id)
     {
-        $this->id = $id;        
+        $this->id = $id;
     }
 }
