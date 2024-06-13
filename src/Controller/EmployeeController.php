@@ -6,17 +6,19 @@ use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
 use App\Entity\Employee;
-use App\Controller\Controller;
 use App\Model\EmployeeModel;
+use App\Controller\BaseController;
 use App\Model\DepartementModel;
 
-class EmployeeController extends Controller
+
+class EmployeeController extends BaseController
 {
     private $model;
 
-    public function __construct(EmployeeModel $employeeModel)
+    public function __construct(EmployeeModel $employeeModel, DepartementModel $departementModel)
     {
         $this->model = $employeeModel;
+        $this->relationModel = $departementModel;                
     }
 
     public function index()
@@ -53,8 +55,8 @@ class EmployeeController extends Controller
                 "Merci de renseigner un id"
             );
         }
-        $model = "Departement";
-        $employee = $this->model->findById($id, $model);
+        $relation = "Departement";
+        $employee = $this->model->findById($id, $relation);
         if (!$employee) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
@@ -67,53 +69,21 @@ class EmployeeController extends Controller
 
     public function newView()
     {
-        $db = new Database;
-        $departementModel = new DepartementModel($db);
-        $departements = $departementModel->findAll();
+        $departements = $this->relationModel->findAll();  
         Renderer::render("employee/nouveau", compact('departements'));
     }
 
     public function new()
-    {
-        $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
-        $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
-        $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);
-        $hireDate = filter_input(INPUT_POST, 'hireDate', FILTER_SANITIZE_SPECIAL_CHARS);
-        $salary = filter_input(INPUT_POST, 'salary', FILTER_SANITIZE_SPECIAL_CHARS);
-        $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
+    {      
 
-        if (!$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
-            $this->redirectWithError(
-                "/mvc-employees/employee/new",
-                "Merci de bien remplir le formulaire"
-            );
-        }
-        /*
-        $id = $this->getPostData('id', FILTER_VALIDATE_INT);
-        $formData = [
-            'lastName' => $this->getPostData('lastName'),
-            'firstName' => $this->getPostData('firstName'),
-            'birthDate' => $this->getPostData('birthDate'),
-            'hireDate' => $this->getPostData('hireDate'),
-            'salary' => $this->getPostData('salary'),
-            'departementId' => $this->getPostData('departementId'),
-        ];
-        
-        if (!$id || in_array(null, $formData, true)) {
-            $this->handleError("/mvc-employees/employee/new", "Merci de bien remplir le formulaire !");
-        }
-*/
-        $model = $this->model;
-        $employee = new Employee([
-            'lastName' => $lastName,
-            'firstName' => $firstName,
-            'birthDate' => $birthDate,
-            'hireDate' => $hireDate,
-            'salary' => $salary,
-            'departementId' => $departementId
-        ]);
+        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
 
-        $model->add($employee);
+         if (!$employee) {
+            $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return;
+        }
+
+        $this->model->add($employee);
 
         $this->redirectWithSuccess(
             "/mvc-employees/employee/index",
@@ -130,48 +100,30 @@ class EmployeeController extends Controller
                 "Merci de renseigner un id"
             );
         }
-        $model = $this->model;
-        $db = new Database;
-        $departementModel = new DepartementModel($db);
-        $employee = $model->findById($id);
+        $model = "Departement";
+        $employee = $this->model->findById($id, $model);        
+        
         if (!$employee) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
                 "Vous essayez de modifier un employé qui n'existe pas !"
             );
         }
-        $departements = $departementModel->findAll();
+
+        $departements = $this->relationModel->findAll();        
         Renderer::Render("employee/modifier", compact('employee', 'departements'));
     }
 
     public function edit()
     {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-        $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
-        $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
-        $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);;
-        $hireDate = filter_input(INPUT_POST, 'hireDate', FILTER_SANITIZE_SPECIAL_CHARS);
-        $salary = filter_input(INPUT_POST, 'salary', FILTER_SANITIZE_SPECIAL_CHARS);
-        $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
+        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
 
-        if (!$id || !$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
-            $this->redirectWithError(
-                "/mvc-employees/employee/new",
-                "Merci de bien remplir le formulaire !"
-            );
-        }
-
-        $model = $this->model;
-        $employee = new Employee([
-            'id' => $id,
-            'lastName' => $lastName,
-            'firstName' => $firstName,
-            'birthDate' => $birthDate,
-            'hireDate' => $hireDate,
-            'salary' => $salary,
-            'departementId' => $departementId
-        ]);
-        $model->update($employee);
+         if (!$employee) {
+            $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return;
+        }       
+               
+        $this->model->update($employee);
 
         $this->redirectWithSuccess(
             "/mvc-employees/employee/index",
@@ -203,4 +155,33 @@ class EmployeeController extends Controller
             "Employé supprimé avec succès"
         );
     }
+    private function createEmployeeFromInput(): array
+        {
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);        
+        $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
+        $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);
+        $hireDate = filter_input(INPUT_POST, 'hireDate', FILTER_SANITIZE_SPECIAL_CHARS);
+        $salary = filter_input(INPUT_POST, 'salary', FILTER_SANITIZE_SPECIAL_CHARS);
+        $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
+
+        if (!$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
+            $redirectUrl = $id ? "/mvc-employees/employee/editView/$id" : "/mvc-employees/employee/newView";
+            return [null, $redirectUrl];
+        }
+        
+        $employee = new Employee([
+            'id' => $id,
+            'lastName' => $lastName,
+            'firstName' => $firstName,
+            'birthDate' => $birthDate,
+            'hireDate' => $hireDate,
+            'salary' => $salary,
+            'departementId' => $departementId
+        ]);
+
+        return [$employee, null];
+    }
+
+    
 }
