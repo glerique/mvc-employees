@@ -26,7 +26,7 @@
             </div>
             <div class="col-12">
               <div class="form-group">
-                Date de naissance de toto : <input class="form-control" type="date" name="birthDate" value="<?= $employee->getBirthDate()->format('Y-m-d'); ?>">
+                Date de naissance : <input class="form-control" type="date" name="birthDate" value="<?= $employee->getBirthDate()->format('Y-m-d'); ?>">
               </div>
             </div>
             <div class="col-12">

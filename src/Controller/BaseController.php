@@ -5,10 +5,8 @@ namespace App\Controller;
 use App\Lib\Http;
 use App\Lib\Session;
 
-abstract class Controller
-{
-
-
+abstract class BaseController
+{    
     protected function redirectWithError(string $url, string $message)
     {
         Session::addFlash('error', $message);
