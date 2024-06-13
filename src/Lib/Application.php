@@ -2,61 +2,42 @@
 
 namespace App\Lib;
 
-use App\Lib\Database;
+use App\Factory\ControllerFactory;
+use App\Lib\Session;
+use App\Lib\Http;
 
 class Application
 {
-    /** 
-     * Router de l'application      
-     */
-    public static function start()
+    private $controllerFactory;
+
+    public function __construct(ControllerFactory $controllerFactory)
+    {
+        $this->controllerFactory = $controllerFactory;
+    }
+
+    
+    public function start()
     {
         session_start();
         $uri = $_SERVER['REQUEST_URI'];
 
-        $params = [];
-
         $params = explode('/', $uri);
+        $controllerName = !empty($params[2]) ? ucfirst($params[2]) : "Employee";
+        $action = !empty($params[3]) ? $params[3] : "index";
+       
+        try {
+            $controller = $this->controllerFactory->createController($controllerName);
 
-        if (!empty($params[2])) {
-            $controllerName = ucfirst($params[2]);
-        } else {
-            $controllerName = "Employee";
-        }
+            if (!method_exists($controller, $action)) {
+                throw new \Exception("L'action que vous avez demandée n'existe pas !");
+            }
 
-        if (!empty($params[3])) {
-            $action = $params[3];
-        } else {
-            $action = "index";
-        }
-
-        $path = "src/Controller/" . $controllerName . "Controller.php";
-        $modelName = "App\Model\\" . $controllerName . "Model";
-        $db = new Database;
-        $model = new $modelName($db);
-        if (!file_exists($path)) {
-            // Si le controller n'existe pas, on affiche une erreur :
-            Session::addFlash('error', "Le controller que vous avez demandé n'existe pas !");
-            Http::redirect('/mvc-employees/');
-        }
-
-        $controllerName = "App\Controller\\" . $controllerName . "Controller";
-
-        $controller = new $controllerName($model);
-
-        if (!method_exists($controller, $action)) {
-            // Si le controller ne connait pas de method pour cette action, on affiche une erreur
-            Session::addFlash('error', "L'action que vous avez demandé n'existe pas !");
+            $id = !empty($params[4]) ? (int)$params[4] : 1;
+            $_GET['id'] = $id;
+            $controller->$action();
+        } catch (\Exception $e) {
+            Session::addFlash('error', $e->getMessage());
             Http::redirect("/mvc-employees/");
-        }
-
-        if (!empty($params[4])) {
-
-            $_GET['id'] = (int)$params[4];
-            $controller->$action();
-        } else {
-            $_GET['id'] = (int)1;
-            $controller->$action();
         }
     }
 }
