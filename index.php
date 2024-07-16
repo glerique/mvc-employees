@@ -1,24 +1,13 @@
 <?php
-require_once 'vendor/autoload.php';
-require_once 'config/config.php';
+require __DIR__ . '/vendor/autoload.php';
 
-ini_set('display_errors', 1);
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;	
 
-use App\Lib\Application;
-use App\Lib\QueryBuilder;
-use App\Lib\DatabaseConfig;
-use App\Lib\DatabaseConnection;
-use App\Factory\ControllerFactory;
-
-$config = new DatabaseConfig(DB_HOST, DB_NAME, DB_USER, DB_PASSWORD);
-$dbConnection = new DatabaseConnection($config);
-$queryBuilder = new QueryBuilder($dbConnection);
-
-$controllerFactory = new ControllerFactory($queryBuilder);
-
-$app = new Application($controllerFactory);
-
+$container = new ContainerBuilder();
+$loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/config'));
+$loader->load('services.yaml');
+$container->compile();
+$app = $container->get(App\Lib\Application::class);
 $app->start();
-
-
-
