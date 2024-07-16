@@ -1,0 +1,27 @@
+parameters:
+    DB_HOST: ''
+    DB_NAME: ''
+    DB_USER: ''
+    DB_PASSWORD: ''
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  App\Lib\DatabaseConfig:    
+    arguments:
+      $host: '%DB_HOST%'
+      $dbname: '%DB_NAME%'
+      $user: '%DB_USER%'
+      $password: '%DB_PASSWORD%'
+
+  App\Lib\DatabaseConnection:       
+
+  App\Lib\QueryBuilder:       
+
+  App\Factory\ControllerFactory:       
+
+  App\Lib\Application:
+    public: true

@@ -29,7 +29,7 @@ class Application
             $action = !empty($params[1]) ? $params[1] : self::DEFAULT_ACTION;
             $id = !empty($params[2]) ? (int) filter_var($params[2], FILTER_VALIDATE_INT) : null;
 
-            $this->dispatch($controllerName, $action, $id);
+            $this->handleRequest($controllerName, $action, $id);
         } catch (\Exception $e) {
             $this->handleException($e);
         }
@@ -37,9 +37,9 @@ class Application
 
     private function getUri()
     {
-        $uri = $_SERVER['REQUEST_URI'];        
-        $uri = rtrim($uri, '/') ?: '/';
-        return $uri;
+        $uri = $_SERVER['REQUEST_URI'];
+        $uri = parse_url($uri, PHP_URL_PATH); 
+        return  rtrim($uri, '/') ?: '/';
     }
 
     private function parseUri($uri)
@@ -49,11 +49,11 @@ class Application
         return array_slice($params, 1); 
     }
 
-    private function dispatch($controllerName, $action, $id)
+    private function handleRequest($controllerName, $action, $id)
     {
         $controller = $this->controllerFactory->createController($controllerName);
 
-        if (!method_exists($controller, $action)) {
+        if (!method_exists($controller, $action) || !is_callable([$controller, $action])) {
             throw new \Exception("L'action que vous avez demandée n'existe pas !");
         }
 
