@@ -1,8 +1,8 @@
 parameters:
-    DB_HOST: ''
-    DB_NAME: ''
-    DB_USER: ''
-    DB_PASSWORD: ''
+  DB_HOST: ''
+  DB_NAME: ''
+  DB_USER: ''
+  DB_PASSWORD: ''
 
 services:
   _defaults:
@@ -10,18 +10,29 @@ services:
     autoconfigure: true
     public: false
 
-  App\Lib\DatabaseConfig:    
+  App\Lib\DatabaseConfig:
     arguments:
       $host: '%DB_HOST%'
       $dbname: '%DB_NAME%'
       $user: '%DB_USER%'
       $password: '%DB_PASSWORD%'
 
-  App\Lib\DatabaseConnection:       
+  App\Lib\DatabaseConnection:
 
-  App\Lib\QueryBuilder:       
-
-  App\Factory\ControllerFactory:       
+  App\Lib\QueryBuilder:
 
   App\Lib\Application:
     public: true
+    arguments:
+      - !service_locator
+          Employee: '@App\Controller\EmployeeController'
+          Departement: '@App\Controller\DepartementController'
+
+  App\Model\EmployeeModel:
+
+  App\Model\DepartementModel:
+
+  App\Controller\EmployeeController:
+
+  App\Controller\DepartementController:
+

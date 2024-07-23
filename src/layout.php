@@ -51,7 +51,7 @@
         <?php if (App\Lib\Session::showFlashes('error')) : ?>
             <div class="alert alert-danger" role="alert">
                 <?php foreach (App\Lib\Session::getFlashes('error') as $message) : ?>
-                    <p><?= $message ?></p>
+                    <p><?= htmlspecialchars($message) ?></p>
                 <?php endforeach ?>
             </div>
         <?php endif ?>
@@ -59,7 +59,7 @@
         <?php if (App\Lib\Session::showFlashes('success')) : ?>
             <div class="alert alert-success">
                 <?php foreach (App\Lib\Session::getFlashes('success') as $message) : ?>
-                    <p><?= $message ?></p>
+                    <p><?= htmlspecialchars($message) ?></p>
                 <?php endforeach ?>
             </div>
         <?php endif ?>

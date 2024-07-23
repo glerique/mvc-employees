@@ -2,9 +2,10 @@
 
 namespace App\Lib;
 
-use App\Factory\ControllerFactory;
-use App\Lib\Session;
 use App\Lib\Http;
+use App\Lib\Session;
+use App\Controller\BaseController;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class Application
 {
@@ -13,12 +14,12 @@ class Application
     const DEFAULT_CONTROLLER = 'Employee';
     const DEFAULT_ACTION = 'index';
 
-    public function __construct(ControllerFactory $controllerFactory)
+    public function __construct(ServiceProviderInterface $controllerProvider)
     {
-        $this->controllerFactory = $controllerFactory;
+        $this->controllerProvider = $controllerProvider;
     }
 
-    public function start()
+    public function start(): void
     {
         session_start();
         try {
@@ -35,23 +36,28 @@ class Application
         }
     }
 
-    private function getUri()
+    private function getUri(): string
     {
         $uri = $_SERVER['REQUEST_URI'];
-        $uri = parse_url($uri, PHP_URL_PATH); 
+        $uri = parse_url($uri, PHP_URL_PATH);
         return  rtrim($uri, '/') ?: '/';
     }
 
-    private function parseUri($uri)
+    private function parseUri(string $uri): array
     {
         $trimmedUri = trim($uri, '/');
         $params = explode('/', $trimmedUri);
-        return array_slice($params, 1); 
+        return array_slice($params, 1);
     }
 
-    private function handleRequest($controllerName, $action, $id)
+    private function handleRequest(string $controllerName, string $action, ?int $id): BaseController
     {
-        $controller = $this->controllerFactory->createController($controllerName);
+
+        if (!$this->controllerProvider->has($controllerName)) {
+            throw new \Exception("Le contrôleur $controllerName n'existe pas !");
+        }
+
+        $controller = $this->controllerProvider->get($controllerName);
 
         if (!method_exists($controller, $action) || !is_callable([$controller, $action])) {
             throw new \Exception("L'action que vous avez demandée n'existe pas !");
@@ -62,9 +68,11 @@ class Application
         }
 
         $controller->$action();
+
+        return $controller;
     }
 
-    private function handleException(\Exception $e)
+    private function handleException(\Exception $e): void
     {
         Session::addFlash('error', $e->getMessage());
         Http::redirect("/mvc-employees/");
