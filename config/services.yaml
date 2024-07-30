@@ -24,9 +24,11 @@ services:
   App\Lib\Application:
     public: true
     arguments:
-      - !service_locator
-          Employee: '@App\Controller\EmployeeController'
-          Departement: '@App\Controller\DepartementController'
+      $controllerProvider: !service_locator
+        employee: '@App\Controller\EmployeeController'
+        departement: '@App\Controller\DepartementController'
+
+  App\Lib\SessionManager:
 
   App\Model\EmployeeModel:
 
@@ -35,4 +37,8 @@ services:
   App\Controller\EmployeeController:
 
   App\Controller\DepartementController:
+
+  Symfony\Component\HttpFoundation\Session\Session:
+
+  Symfony\Component\HttpFoundation\Session\SessionInterface: '@Symfony\Component\HttpFoundation\Session\Session'
 
