@@ -3,32 +3,34 @@
 namespace App\Lib;
 
 use App\Lib\Http;
-use App\Lib\Session;
+use App\Lib\SessionManager;
 use App\Controller\BaseController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class Application
 {
-    private $controllerFactory;
-
-    const DEFAULT_CONTROLLER = 'Employee';
+    const DEFAULT_CONTROLLER = 'employee';
     const DEFAULT_ACTION = 'index';
 
-    public function __construct(ServiceProviderInterface $controllerProvider)
-    {
-        $this->controllerProvider = $controllerProvider;
+    public function __construct(
+        private readonly ServiceProviderInterface $controllerProvider,
+        private readonly SessionManager $sessionManager
+    ) {
+
     }
 
     public function start(): void
     {
-        session_start();
         try {
-            $uri = $this->getUri();
+            $request = Request::createFromGlobals();
+            $uri = $this->getUri($request);
             $params = $this->parseUri($uri);
 
-            $controllerName = !empty($params[0]) ? ucfirst($params[0]) : self::DEFAULT_CONTROLLER;
-            $action = !empty($params[1]) ? $params[1] : self::DEFAULT_ACTION;
-            $id = !empty($params[2]) ? (int) filter_var($params[2], FILTER_VALIDATE_INT) : null;
+            $controllerName = $this->getControllerName($params);
+            $action = $this->getAction($params);
+            $id = $this->getId($params);
 
             $this->handleRequest($controllerName, $action, $id);
         } catch (\Exception $e) {
@@ -36,11 +38,11 @@ class Application
         }
     }
 
-    private function getUri(): string
+    private function getUri(Request $request): string
     {
-        $uri = $_SERVER['REQUEST_URI'];
+        $uri = $request->getPathInfo();
         $uri = parse_url($uri, PHP_URL_PATH);
-        return  rtrim($uri, '/') ?: '/';
+        return rtrim($uri, '/') ?: '/';
     }
 
     private function parseUri(string $uri): array
@@ -52,7 +54,6 @@ class Application
 
     private function handleRequest(string $controllerName, string $action, ?int $id): BaseController
     {
-
         if (!$this->controllerProvider->has($controllerName)) {
             throw new \Exception("Le contrôleur $controllerName n'existe pas !");
         }
@@ -60,7 +61,7 @@ class Application
         $controller = $this->controllerProvider->get($controllerName);
 
         if (!method_exists($controller, $action) || !is_callable([$controller, $action])) {
-            throw new \Exception("L'action que vous avez demandée n'existe pas !");
+            throw new \Exception("L'action $action n'existe pas !");
         }
 
         if ($id !== null) {
@@ -72,9 +73,25 @@ class Application
         return $controller;
     }
 
+    private function getControllerName(array $params): string
+    {
+        return  !empty($params[0]) ? $params[0] : self::DEFAULT_CONTROLLER;
+    }
+
+    private function getAction(array $params): string
+    {
+        return !empty($params[1]) ? $params[1] : self::DEFAULT_ACTION;
+    }
+
+    private function getId(array $params): ?int
+    {
+        return !empty($params[2]) ? (int) filter_var($params[2], FILTER_VALIDATE_INT) : null;
+    }
+
     private function handleException(\Exception $e): void
     {
-        Session::addFlash('error', $e->getMessage());
+        $this->sessionManager->addFlash('error', $e->getMessage());
         Http::redirect("/mvc-employees/");
     }
 }
+

@@ -6,6 +6,7 @@ use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
 use App\Entity\Employee;
+use App\Lib\SessionManager;
 use App\Model\EmployeeModel;
 use App\Controller\BaseController;
 use App\Model\DepartementModel;
@@ -13,12 +14,13 @@ use App\Model\DepartementModel;
 
 class EmployeeController extends BaseController
 {
-    private $model;
-
-    public function __construct(EmployeeModel $employeeModel, DepartementModel $departementModel)
-    {
+    public function __construct(
+        private readonly EmployeeModel $employeeModel,
+        private readonly DepartementModel $DepartementModel,
+        protected readonly SessionManager $sessionManager,
+    ){
         $this->model = $employeeModel;
-        $this->relationModel = $departementModel;                
+        $this->relationModel = $DepartementModel;
     }
 
     public function index()
@@ -43,7 +45,12 @@ class EmployeeController extends BaseController
             );
         }
 
-        Renderer::render("employee/listing", compact('employees', 'currentPage', 'pages'));
+        Renderer::render("employee/listing", [
+            'employees' => $employees,
+            'currentPage' => $currentPage,
+            'pages' => $pages,
+            'sessionManager' => $this->sessionManager
+        ]);
     }
 
     public function show()
@@ -69,13 +76,12 @@ class EmployeeController extends BaseController
 
     public function newView()
     {
-        $departements = $this->relationModel->findAll();  
+        $departements = $this->relationModel->findAll();
         Renderer::render("employee/nouveau", compact('departements'));
     }
 
     public function new()
-    {      
-
+    {
         list($employee, $redirectUrl) = $this->createEmployeeFromInput();
 
          if (!$employee) {
@@ -101,8 +107,8 @@ class EmployeeController extends BaseController
             );
         }
         $model = "Departement";
-        $employee = $this->model->findById($id, $model);        
-        
+        $employee = $this->model->findById($id, $model);
+
         if (!$employee) {
             $this->redirectWithError(
                 "/mvc-employees/employee/index",
@@ -110,7 +116,7 @@ class EmployeeController extends BaseController
             );
         }
 
-        $departements = $this->relationModel->findAll();        
+        $departements = $this->relationModel->findAll();
         Renderer::Render("employee/modifier", compact('employee', 'departements'));
     }
 
@@ -121,8 +127,8 @@ class EmployeeController extends BaseController
          if (!$employee) {
             $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
             return;
-        }       
-               
+        }
+
         $this->model->update($employee);
 
         $this->redirectWithSuccess(
@@ -155,9 +161,10 @@ class EmployeeController extends BaseController
             "Employé supprimé avec succès"
         );
     }
+
     private function createEmployeeFromInput(): array
         {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);        
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
         $firstName = filter_input(INPUT_POST, 'firstName', FILTER_SANITIZE_SPECIAL_CHARS);
         $birthDate = filter_input(INPUT_POST, 'birthDate', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -169,7 +176,7 @@ class EmployeeController extends BaseController
             $redirectUrl = $id ? "/mvc-employees/employee/editView/$id" : "/mvc-employees/employee/newView";
             return [null, $redirectUrl];
         }
-        
+
         $employee = new Employee([
             'id' => $id,
             'lastName' => $lastName,
@@ -182,6 +189,5 @@ class EmployeeController extends BaseController
 
         return [$employee, null];
     }
-
-    
 }
+
