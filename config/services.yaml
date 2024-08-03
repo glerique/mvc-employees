@@ -30,6 +30,8 @@ services:
 
   App\Lib\SessionManager:
 
+  App\Lib\Redirector:
+
   App\Model\EmployeeModel:
 
   App\Model\DepartementModel:

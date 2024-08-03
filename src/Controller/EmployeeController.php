@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
+use App\Lib\Redirector;
 use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
 use App\Entity\Employee;
 use App\Lib\SessionManager;
 use App\Model\EmployeeModel;
-use App\Controller\BaseController;
 use App\Model\DepartementModel;
+use App\Controller\BaseController;
 
 
 class EmployeeController extends BaseController
@@ -18,6 +19,7 @@ class EmployeeController extends BaseController
         private readonly EmployeeModel $employeeModel,
         private readonly DepartementModel $DepartementModel,
         protected readonly SessionManager $sessionManager,
+        protected readonly Redirector $redirector,
     ){
         $this->model = $employeeModel;
         $this->relationModel = $DepartementModel;

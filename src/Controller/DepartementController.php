@@ -2,18 +2,20 @@
 
 namespace App\Controller;
 
+use App\Lib\Redirector;
 use App\Lib\Renderer;
 use App\Lib\QueryBuilder;
 use App\Entity\Departement;
 use App\Lib\SessionManager;
-use App\Controller\BaseController;
 use App\Model\DepartementModel;
+use App\Controller\BaseController;
 
 class DepartementController extends BaseController
 {
     public function __construct(
         private readonly DepartementModel $model,
         protected readonly SessionManager $sessionManager,
+        protected readonly Redirector $redirector,
     ){
     }
 
