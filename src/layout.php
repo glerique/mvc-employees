@@ -48,17 +48,17 @@
     </div>
 
     <div class="container">
-        <?php if (App\Lib\Session::showFlashes('error')) : ?>
+        <?php if (isset($sessionManager) && $sessionManager->showFlashes('error')) : ?>
             <div class="alert alert-danger" role="alert">
-                <?php foreach (App\Lib\Session::getFlashes('error') as $message) : ?>
+                <?php foreach ($sessionManager->getFlashes('error') as $message) : ?>
                     <p><?= htmlspecialchars($message) ?></p>
                 <?php endforeach ?>
             </div>
         <?php endif ?>
 
-        <?php if (App\Lib\Session::showFlashes('success')) : ?>
+        <?php if (isset($sessionManager) && $sessionManager->showFlashes('success')) : ?>
             <div class="alert alert-success">
-                <?php foreach (App\Lib\Session::getFlashes('success') as $message) : ?>
+                <?php foreach ($sessionManager->getFlashes('success') as $message) : ?>
                     <p><?= htmlspecialchars($message) ?></p>
                 <?php endforeach ?>
             </div>

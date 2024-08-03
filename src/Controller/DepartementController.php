@@ -2,29 +2,31 @@
 
 namespace App\Controller;
 
+use App\Lib\Redirector;
 use App\Lib\Renderer;
 use App\Lib\QueryBuilder;
 use App\Entity\Departement;
-use App\Controller\BaseController;
+use App\Lib\SessionManager;
 use App\Model\DepartementModel;
+use App\Controller\BaseController;
 
 class DepartementController extends BaseController
 {
-
-    private $model;
-
-    public function __construct(DepartementModel $departementModel)
-    {
-        $this->model = $departementModel;
-       
+    public function __construct(
+        private readonly DepartementModel $model,
+        protected readonly SessionManager $sessionManager,
+        protected readonly Redirector $redirector,
+    ){
     }
 
     public function index()
     {
-
         $departements = $this->model->findAll();
 
-        Renderer::render("departement/listing", compact('departements'));
+        Renderer::render("departement/listing", [
+            'departements' => $departements,
+            'sessionManager' => $this->sessionManager
+        ]);
     }
 
     public function show()
@@ -54,12 +56,12 @@ class DepartementController extends BaseController
 
     public function new()
     {
-        list($departement, $redirectUrl) = $this->createDepartementFromInput();        
+        list($departement, $redirectUrl) = $this->createDepartementFromInput();
          if (!$departement) {
             $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
             return;
-        }     
-        
+        }
+
         $this->model->add($departement);
 
         $this->redirectWithSuccess(
@@ -77,7 +79,7 @@ class DepartementController extends BaseController
                 "Merci de renseigner un id"
             );
         }
-       
+
         $departement = $this->model->findById($id);
         if (!$departement) {
             $this->redirectWithError(
@@ -95,8 +97,8 @@ class DepartementController extends BaseController
          if (!$departement) {
             $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
             return;
-        }    
-        
+        }
+
         $this->model->update($departement);
 
         $this->redirectWithSuccess(
@@ -133,8 +135,8 @@ class DepartementController extends BaseController
 
     private function createDepartementFromInput(): array
     {
-        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);        
-        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);        
+        $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+        $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
         if (!$name) {
             $redirectUrl = $id ? "/mvc-employees/departement/editView/$id" : "/mvc-employees/departement/newView";
             return [null, $redirectUrl];
@@ -142,7 +144,7 @@ class DepartementController extends BaseController
 
         $departement =  new Departement([
             'id' => $id,
-            'name' => $name            
+            'name' => $name
         ]);
 
         return [$departement,null];
