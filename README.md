@@ -1,2 +1,2 @@
 # mvc-employees
-PHP oriented object training
+Object Oriented PHP Training

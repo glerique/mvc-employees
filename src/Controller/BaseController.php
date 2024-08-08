@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+
 use App\Lib\Redirector;
 use App\Lib\SessionManager;
 
@@ -16,18 +17,18 @@ abstract class BaseController
     protected function redirectWithError(string $url, string $message)
     {
         $this->sessionManager->addFlash('error', $message);
-        $this->redirector->redirect($url);
+        return $this->redirector->redirect($url);
     }
 
     protected function redirectWithSuccess(string $url, string $message)
     {
         $this->sessionManager->addFlash('success', $message);
-        $this->redirector->redirect($url);
+        return $this->redirector->redirect($url);
     }
 
     protected function redirect(string $url)
     {
-        $this->redirector->redirect($url);
+        return $this->redirector->redirect($url);
     }
 }
 

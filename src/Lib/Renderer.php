@@ -2,10 +2,12 @@
 
 namespace App\Lib;
 
+use Symfony\Component\HttpFoundation\Response;
+
 class Renderer
 {
 
-    public static function render(string $path, array $var = []): void
+    public static function render(string $path, array $var = []): Response
     {
         extract($var);
 
@@ -14,5 +16,8 @@ class Renderer
         $pageContent = ob_get_clean();
 
         require('src/layout.php');
+
+        return new Response($pageContent);
     }
 }
+
