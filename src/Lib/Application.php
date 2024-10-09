@@ -19,7 +19,7 @@ class Application
     public function __construct(
         private readonly ServiceProviderInterface $controllerProvider,
         private readonly SessionManager $sessionManager,
-        private readonly Redirector $redirector
+        private readonly Redirector $redirector,
     ) {
 
     }

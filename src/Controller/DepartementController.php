@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Lib\Renderer;
 use App\Lib\Redirector;
 use App\Lib\QueryBuilder;
