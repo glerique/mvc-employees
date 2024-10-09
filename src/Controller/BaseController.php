@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Lib\Redirector;
 use App\Lib\SessionManager;
 use Symfony\Component\HttpFoundation\Response;
