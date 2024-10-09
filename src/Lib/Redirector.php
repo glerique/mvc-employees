@@ -7,11 +7,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class Redirector
 {
-    public function redirect(string $url): Response
+    public function redirect(string $url): RedirectResponse
     {
-        $response = new RedirectResponse($url);
-        $response->send();
-        exit;
+        return new RedirectResponse($url);
     }
 }
 

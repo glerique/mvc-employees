@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
+use App\Lib\Redirector;
 use App\Entity\Employee;
 use App\Lib\SessionManager;
 use App\Model\EmployeeModel;
@@ -17,11 +18,13 @@ class EmployeeController extends BaseController
 {
     public function __construct(
         private readonly EmployeeModel $employeeModel,
-        private readonly DepartementModel $DepartementModel,
-        protected readonly SessionManager $sessionManager
-    ){
+        private readonly DepartementModel $departementModel,
+        SessionManager $sessionManager,
+        Redirector $redirector,
+    ) {
+        parent::__construct($sessionManager, $redirector);
         $this->model = $employeeModel;
-        $this->relationModel = $DepartementModel;
+        $this->relationModel = $departementModel;
     }
 
     public function index(): Response

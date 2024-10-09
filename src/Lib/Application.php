@@ -35,9 +35,14 @@ class Application
             $action = $this->getAction($params);
             $id = $this->getId($params);
 
-            $this->handleRequest($controllerName, $action, $id);
+            $response = $this->handleRequest($controllerName, $action, $id);
+
+            $response->send();
+
         } catch (\Exception $e) {
-            $this->handleException($e);
+            $response = $this->handleException($e);
+
+            $response->send();
         }
     }
 
@@ -55,7 +60,7 @@ class Application
         return array_slice($params, 1);
     }
 
-    private function handleRequest(string $controllerName, string $action, ?int $id): BaseController
+    private function handleRequest(string $controllerName, string $action, ?int $id): Response
     {
         if (!$this->controllerProvider->has($controllerName)) {
             throw new \Exception("Le contrôleur $controllerName n'existe pas !");
@@ -71,9 +76,7 @@ class Application
             $_GET['id'] = $id;
         }
 
-        $controller->$action();
-
-        return $controller;
+        return $controller->$action();
     }
 
     private function getControllerName(array $params): string

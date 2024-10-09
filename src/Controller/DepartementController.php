@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Lib\Renderer;
+use App\Lib\Redirector;
 use App\Lib\QueryBuilder;
 use App\Entity\Departement;
 use App\Lib\SessionManager;
@@ -15,8 +16,10 @@ class DepartementController extends BaseController
 {
     public function __construct(
         private readonly DepartementModel $model,
-        protected readonly SessionManager $sessionManager
+        SessionManager $sessionManager,
+        Redirector $redirector,
     ){
+        parent::__construct($sessionManager, $redirector);
     }
 
     public function index(): Response

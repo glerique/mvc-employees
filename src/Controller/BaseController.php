@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Lib\Redirector;
 use App\Lib\SessionManager;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseController
 {
@@ -14,19 +15,19 @@ abstract class BaseController
     ) {
     }
 
-    protected function redirectWithError(string $url, string $message)
+    protected function redirectWithError(string $url, string $message): Response
     {
         $this->sessionManager->addFlash('error', $message);
         return $this->redirector->redirect($url);
     }
 
-    protected function redirectWithSuccess(string $url, string $message)
+    protected function redirectWithSuccess(string $url, string $message): Response
     {
         $this->sessionManager->addFlash('success', $message);
         return $this->redirector->redirect($url);
     }
 
-    protected function redirect(string $url)
+    protected function redirect(string $url): Response
     {
         return $this->redirector->redirect($url);
     }
