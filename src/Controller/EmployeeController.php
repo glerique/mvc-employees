@@ -17,14 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 class EmployeeController extends BaseController
 {
     public function __construct(
-        private readonly EmployeeModel $employeeModel,
-        private readonly DepartementModel $departementModel,
+        private readonly EmployeeModel $model,
+        private readonly DepartementModel $relationModel,
         SessionManager $sessionManager,
         Redirector $redirector,
     ) {
         parent::__construct($sessionManager, $redirector);
-        $this->model = $employeeModel;
-        $this->relationModel = $departementModel;
     }
 
     public function index(): Response

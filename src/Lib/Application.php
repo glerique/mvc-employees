@@ -37,13 +37,10 @@ class Application
 
             $response = $this->handleRequest($controllerName, $action, $id);
 
-            $response->send();
-
         } catch (\Exception $e) {
             $response = $this->handleException($e);
-
-            $response->send();
         }
+        $response->send();
     }
 
     private function getUri(Request $request): string
