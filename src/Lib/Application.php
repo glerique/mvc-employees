@@ -3,9 +3,11 @@
 namespace App\Lib;
 
 use App\Lib\Http;
+use App\Lib\Redirector;
 use App\Lib\SessionManager;
 use App\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -16,7 +18,8 @@ class Application
 
     public function __construct(
         private readonly ServiceProviderInterface $controllerProvider,
-        private readonly SessionManager $sessionManager
+        private readonly SessionManager $sessionManager,
+        private readonly Redirector $redirector,
     ) {
 
     }
@@ -32,10 +35,12 @@ class Application
             $action = $this->getAction($params);
             $id = $this->getId($params);
 
-            $this->handleRequest($controllerName, $action, $id);
+            $response = $this->handleRequest($controllerName, $action, $id);
+
         } catch (\Exception $e) {
-            $this->handleException($e);
+            $response = $this->handleException($e);
         }
+        $response->send();
     }
 
     private function getUri(Request $request): string
@@ -52,7 +57,7 @@ class Application
         return array_slice($params, 1);
     }
 
-    private function handleRequest(string $controllerName, string $action, ?int $id): BaseController
+    private function handleRequest(string $controllerName, string $action, ?int $id): Response
     {
         if (!$this->controllerProvider->has($controllerName)) {
             throw new \Exception("Le contrôleur $controllerName n'existe pas !");
@@ -68,9 +73,7 @@ class Application
             $_GET['id'] = $id;
         }
 
-        $controller->$action();
-
-        return $controller;
+        return $controller->$action();
     }
 
     private function getControllerName(array $params): string
@@ -88,10 +91,10 @@ class Application
         return !empty($params[2]) ? (int) filter_var($params[2], FILTER_VALIDATE_INT) : null;
     }
 
-    private function handleException(\Exception $e): void
+    private function handleException(\Exception $e): Response
     {
         $this->sessionManager->addFlash('error', $e->getMessage());
-        Http::redirect("/mvc-employees/");
+        return $this->redirector->redirect("/mvc-employees/");
     }
 }
 
