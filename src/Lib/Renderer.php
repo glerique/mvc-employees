@@ -3,22 +3,20 @@
 namespace App\Lib;
 
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class Renderer
 {
-    public static function render(string $path, array $var = []): Response
+    public function __construct(
+        private readonly Environment $twig,
+    ) {
+    }
+
+    public function render(string $template, array $data = []): Response
     {
-        extract($var);
+        $pageContent = $this->twig->render($template . '.twig', $data);
 
-        ob_start();
-        require('src/View/' . $path . '.view.php');
-        $pageContent = ob_get_clean();
-
-        ob_start();
-        require('src/layout.php');
-        $finalContent = ob_get_clean();
-
-        return new Response($finalContent);
+        return new Response($pageContent);
     }
 }
 

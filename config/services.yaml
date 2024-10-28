@@ -32,6 +32,8 @@ services:
 
   App\Lib\Redirector:
 
+  App\Lib\Renderer:
+
   App\Model\EmployeeModel:
 
   App\Model\DepartementModel:
@@ -43,4 +45,13 @@ services:
   Symfony\Component\HttpFoundation\Session\Session:
 
   Symfony\Component\HttpFoundation\Session\SessionInterface: '@Symfony\Component\HttpFoundation\Session\Session'
+
+  Twig\Loader\FilesystemLoader:
+    arguments:
+      $paths:
+        - './templates'
+
+  Twig\Environment:
+    arguments:
+      $loader: '@Twig\Loader\FilesystemLoader'
 

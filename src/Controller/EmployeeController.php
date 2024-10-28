@@ -21,8 +21,9 @@ class EmployeeController extends BaseController
         private readonly DepartementModel $relationModel,
         SessionManager $sessionManager,
         Redirector $redirector,
+        Renderer $renderer,
     ) {
-        parent::__construct($sessionManager, $redirector);
+        parent::__construct($sessionManager, $redirector, $renderer);
     }
 
     public function index(): Response
@@ -47,11 +48,11 @@ class EmployeeController extends BaseController
             );
         }
 
-        return Renderer::render("employee/listing", [
+        return $this->renderer->render('employee/index', [
             'employees' => $employees,
             'currentPage' => $currentPage,
             'pages' => $pages,
-            'sessionManager' => $this->sessionManager
+            'sessionManager' => $this->sessionManager,
         ]);
     }
 
@@ -73,13 +74,13 @@ class EmployeeController extends BaseController
             );
         }
 
-        return Renderer::render("employee/details", compact('employee'));
+        return $this->renderer->render("employee/show", compact('employee'));
     }
 
     public function newView(): Response
     {
         $departements = $this->relationModel->findAll();
-        return Renderer::render("employee/nouveau", compact('departements'));
+        return $this->renderer->render('employee/new', compact('departements'));
     }
 
     public function new(): Response
@@ -118,7 +119,7 @@ class EmployeeController extends BaseController
         }
 
         $departements = $this->relationModel->findAll();
-        return Renderer::Render("employee/modifier", compact('employee', 'departements'));
+        return $this->renderer->Render("employee/edit", compact('employee', 'departements'));
     }
 
     public function edit(): Response

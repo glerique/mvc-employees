@@ -17,17 +17,18 @@ class DepartementController extends BaseController
         private readonly DepartementModel $model,
         SessionManager $sessionManager,
         Redirector $redirector,
+        Renderer $renderer,
     ){
-        parent::__construct($sessionManager, $redirector);
+        parent::__construct($sessionManager, $redirector, $renderer);
     }
 
     public function index(): Response
     {
         $departements = $this->model->findAll();
 
-        return Renderer::render("departement/listing", [
+        return $this->renderer->render("departement/index", [
             'departements' => $departements,
-            'sessionManager' => $this->sessionManager
+            'sessionManager' => $this->sessionManager,
         ]);
     }
 
@@ -48,12 +49,12 @@ class DepartementController extends BaseController
                 "Vous essayé de consulter un service qui n'existe pas !"
             );
         }
-        return Renderer::render("departement/details", compact('departement'));
+        return $this->renderer->render("departement/show", compact('departement'));
     }
 
     public function newView(): Response
     {
-        return Renderer::render("departement/nouveau");
+        return $this->renderer->render("departement/new");
     }
 
     public function new(): Response
@@ -88,7 +89,7 @@ class DepartementController extends BaseController
                 "Vous essayé de modifier un service qui n'existe pas !"
             );
         }
-        return Renderer::Render("departement/modifier", compact('departement'));
+        return $this->renderer->Render("departement/edit", compact('departement'));
     }
 
     public function edit(): Response
