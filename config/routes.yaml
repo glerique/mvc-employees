@@ -1,0 +1,104 @@
+homepage:
+  path: /
+  defaults:
+    _controller: 'employee'
+    _action: 'index'
+
+employee_index:
+  path: /mvc-employees/employee/index/{nb}
+  defaults:
+    _controller: 'employee'
+    _action: 'index'
+  requirements:
+    nb: '\d*'
+
+employee_show:
+  path: /mvc-employees/employee/show/{id}
+  defaults:
+    _controller: 'employee'
+    _action: 'show'
+  requirements:
+    id: '\d+'
+
+employee_newView:
+  path: /mvc-employees/employee/newView
+  defaults:
+    _controller: 'employee'
+    _action: 'newView'
+
+employee_new:
+  path: /mvc-employees/employee/new
+  defaults:
+    _controller: 'employee'
+    _action: 'new'
+
+employee_editView:
+  path: /mvc-employees/employee/editView/{id}
+  defaults:
+    _controller: 'employee'
+    _action: 'editView'
+  requirements:
+    id: '\d+'
+
+employee_edit:
+  path: /mvc-employees/employee/edit
+  defaults:
+    _controller: 'employee'
+    _action: 'edit'
+
+employee_delete:
+  path: /mvc-employees/employee/delete/{id}
+  defaults:
+    _controller: 'employee'
+    _action: 'delete'
+  requirements:
+    id: '\d+'
+
+departement_index:
+  path: /mvc-employees/departement/index
+  defaults:
+    _controller: 'departement'
+    _action: 'index'
+
+departement_show:
+  path: /mvc-employees/departement/show/{id}
+  defaults:
+    _controller: 'departement'
+    _action: 'show'
+  requirements:
+    id: '\d+'
+
+departement_newView:
+  path: /mvc-employees/departement/newView
+  defaults:
+    _controller: 'departement'
+    _action: 'newView'
+
+departement_new:
+  path: /mvc-employees/departement/new
+  defaults:
+    _controller: 'departement'
+    _action: 'new'
+
+departement_editView:
+  path: /mvc-employees/departement/editView/{id}
+  defaults:
+    _controller: 'departement'
+    _action: 'editView'
+  requirements:
+    id: '\d+'
+
+departement_edit:
+  path: /mvc-employees/departement/edit
+  defaults:
+    _controller: 'departement'
+    _action: 'edit'
+
+departement_delete:
+  path: /mvc-employees/departement/delete/{id}
+  defaults:
+    _controller: 'departement'
+    _action: 'delete'
+  requirements:
+    id: '\d+'
+

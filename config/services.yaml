@@ -10,6 +10,9 @@ services:
     autoconfigure: true
     public: false
 
+  App\:
+        resource: '../src/'
+
   App\Lib\DatabaseConfig:
     arguments:
       $host: '%DB_HOST%'
@@ -17,30 +20,12 @@ services:
       $user: '%DB_USER%'
       $password: '%DB_PASSWORD%'
 
-  App\Lib\DatabaseConnection:
-
-  App\Lib\QueryBuilder:
-
   App\Lib\Application:
     public: true
     arguments:
       $controllerProvider: !service_locator
         employee: '@App\Controller\EmployeeController'
         departement: '@App\Controller\DepartementController'
-
-  App\Lib\SessionManager:
-
-  App\Lib\Redirector:
-
-  App\Lib\Renderer:
-
-  App\Model\EmployeeModel:
-
-  App\Model\DepartementModel:
-
-  App\Controller\EmployeeController:
-
-  App\Controller\DepartementController:
 
   Symfony\Component\HttpFoundation\Session\Session:
 
@@ -54,4 +39,39 @@ services:
   Twig\Environment:
     arguments:
       $loader: '@Twig\Loader\FilesystemLoader'
+
+  Symfony\Component\Routing\Router:
+    arguments:
+      $loader: '@Symfony\Component\Routing\Loader\YamlFileLoader'
+      $resource: 'routes.yaml'
+
+  Symfony\Component\Routing\RouterInterface:
+    alias: Symfony\Component\Routing\Router
+
+  Symfony\Component\Config\FileLocator:
+    arguments:
+      $paths:
+        - './config'
+
+  Symfony\Component\Routing\Loader\YamlFileLoader:
+    arguments:
+      $locator: '@Symfony\Component\Config\FileLocator'
+
+  Symfony\Component\Routing\RouteCollection:
+    factory: ['@Symfony\Component\Routing\Loader\YamlFileLoader', 'load']
+    arguments:
+      - 'routes.yaml'
+
+  Twig\TwigFunction:
+    arguments:
+      $name: 'path'
+      $callable: ['@Symfony\Component\Routing\Router', 'generate']
+
+  App\Lib\TwigRouterConfigurator:
+    arguments:
+      $twig: '@Twig\Environment'
+      $router: '@Symfony\Component\Routing\Router'
+    calls:
+      - method: 'configure'
+        arguments: []
 
