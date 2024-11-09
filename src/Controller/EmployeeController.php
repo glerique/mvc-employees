@@ -31,7 +31,7 @@ class EmployeeController extends BaseController
         $id = $_GET['id'];
         if (!$id or !is_int($id)) {
             return $this->redirect(
-                "/mvc-employees/employee/index/1"
+                "/"
             );
         }
 
@@ -43,7 +43,7 @@ class EmployeeController extends BaseController
         $employees = $this->model->PaginateFindAll($id, $perPage);
         if (!$employees) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index/1",
+                "/",
                 "Vous essayez de consulter une page qui n'existe pas !"
             );
         }
@@ -61,7 +61,7 @@ class EmployeeController extends BaseController
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
         if (!$id or !is_int($id)) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Merci de renseigner un id"
             );
         }
@@ -69,7 +69,7 @@ class EmployeeController extends BaseController
         $employee = $this->model->findById($id, $relation);
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Vous essayez de consulter un employee qui n'existe pas !"
             );
         }
@@ -85,16 +85,18 @@ class EmployeeController extends BaseController
 
     public function new(): Response
     {
-        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
+        list($employee) = $this->createEmployeeFromInput();
 
          if (!$employee) {
-            return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return $this->redirectWithError(
+                "/",
+                "Merci de bien remplir le formulaire");
         }
 
         $this->model->add($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            "/",
             "Employé ajouté avec succès"
         );
     }
@@ -104,7 +106,7 @@ class EmployeeController extends BaseController
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
         if (!$id or !is_int($id)) {
             $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Merci de renseigner un id"
             );
         }
@@ -113,7 +115,7 @@ class EmployeeController extends BaseController
 
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Vous essayez de modifier un employé qui n'existe pas !"
             );
         }
@@ -124,16 +126,18 @@ class EmployeeController extends BaseController
 
     public function edit(): Response
     {
-        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
+        list($employee) = $this->createEmployeeFromInput();
 
          if (!$employee) {
-            return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return $this->redirectWithError(
+                "/",
+                "Merci de bien remplir le formulaire");
         }
 
         $this->model->update($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            "/",
             "Employé modifié avec succès"
         );
     }
@@ -143,7 +147,7 @@ class EmployeeController extends BaseController
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
         if (!$id or !is_int($id)) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Merci de renseigner un id"
             );
         }
@@ -151,14 +155,14 @@ class EmployeeController extends BaseController
         $employee = $model->findById($id);
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                "/",
                 "Vous essayez de supprimer un employé qui n'existe pas !"
             );
         }
         $model->deleteById($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            "/",
             "Employé supprimé avec succès"
         );
     }
@@ -174,8 +178,7 @@ class EmployeeController extends BaseController
         $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (!$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
-            $redirectUrl = $id ? "/mvc-employees/employee/editView/$id" : "/mvc-employees/employee/newView";
-            return [null, $redirectUrl];
+            return [null];
         }
 
         $employee = new Employee([

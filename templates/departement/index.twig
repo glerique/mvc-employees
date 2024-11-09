@@ -15,10 +15,10 @@
                     <tbody>
                         {% for departement in departements %}
                             <tr>
-                            <td><a href="/mvc-employees/departement/show/{{ departement.getId() }}">{{ departement.getId() }}</a></td>
+                            <td><a href="{{ path('departement_show', { 'id': departement.getId() }) }}">{{ departement.getId() }}</a></td>
                             <td>{{departement.getName}}</td>
-                            <td><a href="/mvc-employees/departement/editView/{{ departement.getId() }}">Modifier</a></td>
-                            <td><a href="/mvc-employees/departement/delete/{{ departement.getId() }}">Supprimer</a></td>
+                            <td><a href="{{ path('departement_editView', { 'id': departement.getId() }) }}">Modifier</a></td>
+                            <td><a href="{{ path('departement_delete', { 'id': departement.getId() }) }}">Supprimer</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>

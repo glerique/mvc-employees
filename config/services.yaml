@@ -55,3 +55,34 @@ services:
     arguments:
       $loader: '@Twig\Loader\FilesystemLoader'
 
+  Symfony\Component\Routing\Router:
+    arguments:
+      $loader: '@Symfony\Component\Routing\Loader\YamlFileLoader'
+      $resource: '/home/gael/Bureau/Dev/mvc-employees/config/routes.yaml'
+
+  Symfony\Component\Config\FileLocator:
+    arguments:
+      - '/home/gael/Bureau/Dev/mvc-employees/config'
+
+  Symfony\Component\Routing\Loader\YamlFileLoader:
+    arguments:
+      $locator: '@Symfony\Component\Config\FileLocator'
+
+  Symfony\Component\Routing\RouteCollection:
+    factory: ['@Symfony\Component\Routing\Loader\YamlFileLoader', 'load']
+    arguments:
+      - 'routes.yaml'
+
+  Twig\TwigFunction:
+    arguments:
+      $name: 'path'
+      $callable: ['@Symfony\Component\Routing\Router', 'generate']
+
+  App\Lib\TwigRouterConfigurator:
+    arguments:
+      $twig: '@Twig\Environment'
+      $router: '@Symfony\Component\Routing\Router'
+    calls:
+      - method: 'configure'
+        arguments: []
+

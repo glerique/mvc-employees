@@ -38,14 +38,14 @@ class DepartementController extends BaseController
 
         if (!$id) {
             $this->redirectWithError(
-                "/mvc-employees/departement/index",
+                "/mvc-employees/departement/index/1",
                 "Merci de renseigner un id"
             );
         }
         $departement = $this->model->findById($id);
         if (!$departement) {
             $this->redirectWithError(
-                "/mvc-employees/departement/index",
+                "/mvc-employees/departement/index/1",
                 "Vous essayé de consulter un service qui n'existe pas !"
             );
         }
@@ -59,15 +59,18 @@ class DepartementController extends BaseController
 
     public function new(): Response
     {
-        list($departement, $redirectUrl) = $this->createDepartementFromInput();
+        list($departement) = $this->createDepartementFromInput();
+
          if (!$departement) {
-            $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+           return $this->redirectWithError(
+            "/mvc-employees/departement/index/1",
+            "Merci de bien remplir le formulaire");
         }
 
         $this->model->add($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            "/mvc-employees/departement/index/1",
             "Service ajouté avec succès"
         );
     }
@@ -77,7 +80,7 @@ class DepartementController extends BaseController
         $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
         if (!$id or !is_int($id)) {
             return $this->redirectWithError(
-                "/mvc-employees/departement/index",
+                "/mvc-employees/departement/index/1",
                 "Merci de renseigner un id"
             );
         }
@@ -85,7 +88,7 @@ class DepartementController extends BaseController
         $departement = $this->model->findById($id);
         if (!$departement) {
             return $this->redirectWithError(
-                "/mvc-employees/departement/index",
+                "/mvc-employees/departement/index/1",
                 "Vous essayé de modifier un service qui n'existe pas !"
             );
         }
@@ -94,16 +97,18 @@ class DepartementController extends BaseController
 
     public function edit(): Response
     {
-        list($departement, $redirectUrl) = $this->createDepartementFromInput();
+        list($departement) = $this->createDepartementFromInput();
 
          if (!$departement) {
-           return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+           return $this->redirectWithError(
+            "/mvc-employees/departement/index/1",
+            "Merci de bien remplir le formulaire");
         }
 
         $this->model->update($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            "/mvc-employees/departement/index/1",
             "Service modifié avec succès"
         );
     }
@@ -122,14 +127,14 @@ class DepartementController extends BaseController
         $departement = $model->findById($id);
         if (!$departement) {
             return $this->redirectWithError(
-                "/mvc-employees/departement/index",
+                "/mvc-employees/departement/index/1",
                 "Vous essayé de supprimer un service qui n'existe pas !"
             );
         }
         $model->deleteById($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            "/mvc-employees/departement/index/1",
             "Service supprimé avec succès"
         );
     }
@@ -138,9 +143,9 @@ class DepartementController extends BaseController
     {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+
         if (!$name) {
-            $redirectUrl = $id ? "/mvc-employees/departement/editView/$id" : "/mvc-employees/departement/newView";
-            return [null, $redirectUrl];
+            return [null];
         }
 
         $departement =  new Departement([
@@ -148,7 +153,7 @@ class DepartementController extends BaseController
             'name' => $name
         ]);
 
-        return [$departement,null];
+        return [$departement];
     }
 }
 
