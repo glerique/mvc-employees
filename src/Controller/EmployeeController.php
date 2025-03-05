@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Lib\Database;
 use App\Lib\Renderer;
 use App\Lib\Pagination;
 use App\Lib\Redirector;
@@ -11,39 +10,38 @@ use App\Lib\SessionManager;
 use App\Model\EmployeeModel;
 use App\Model\DepartementModel;
 use App\Controller\BaseController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use Symfony\Component\Routing\RouterInterface;
 
 class EmployeeController extends BaseController
 {
+    protected const DEFAULT_ROUTE = 'employee_index';
+
     public function __construct(
         private readonly EmployeeModel $model,
         private readonly DepartementModel $relationModel,
         SessionManager $sessionManager,
         Redirector $redirector,
         Renderer $renderer,
+        RouterInterface $router,
     ) {
-        parent::__construct($sessionManager, $redirector, $renderer);
+        parent::__construct($sessionManager, $redirector, $renderer, $router);
     }
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $id = $_GET['id'];
-        if (!$id or !is_int($id)) {
-            return $this->redirect(
-                "/mvc-employees/employee/index/1"
-            );
-        }
+        $nb = $request->get('nb') ?? self::DEFAULT_PAGE;
 
         $total = $this->model->count();
         $pagination = new Pagination($total);
         $pages = $pagination->getPages();
         $currentPage = $pagination->getCurrentPage();
         $perPage = $pagination->getPerPage();
-        $employees = $this->model->PaginateFindAll($id, $perPage);
+        $employees = $this->model->PaginateFindAll($nb, $perPage);
         if (!$employees) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index/1",
+                $this->getIndexRoute($nb),
                 "Vous essayez de consulter une page qui n'existe pas !"
             );
         }
@@ -53,23 +51,19 @@ class EmployeeController extends BaseController
             'currentPage' => $currentPage,
             'pages' => $pages,
             'sessionManager' => $this->sessionManager,
+            'nb' => $nb,
         ]);
     }
 
-    public function show(): Response
+    public function show(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        if (!$id or !is_int($id)) {
-            return $this->redirectWithError(
-                "/mvc-employees/employee/index",
-                "Merci de renseigner un id"
-            );
-        }
+        $id = $request->get('id');
+
         $relation = "Departement";
         $employee = $this->model->findById($id, $relation);
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                $this->getIndexRoute(),
                 "Vous essayez de consulter un employee qui n'existe pas !"
             );
         }
@@ -85,85 +79,78 @@ class EmployeeController extends BaseController
 
     public function new(): Response
     {
-        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
+        $employee = $this->createEmployeeFromInput();
 
          if (!$employee) {
-            return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return $this->redirectWithError(
+                $this->getIndexRoute(),
+                "Merci de bien remplir le formulaire");
         }
 
         $this->model->add($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            $this->getIndexRoute(),
             "Employé ajouté avec succès"
         );
     }
 
-    public function editView(): Response
+    public function editView(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        if (!$id or !is_int($id)) {
-            $this->redirectWithError(
-                "/mvc-employees/employee/index",
-                "Merci de renseigner un id"
-            );
-        }
+        $id = $request->get('id');
+
         $model = "Departement";
         $employee = $this->model->findById($id, $model);
 
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                $this->getIndexRoute(),
                 "Vous essayez de modifier un employé qui n'existe pas !"
             );
         }
 
         $departements = $this->relationModel->findAll();
-        return $this->renderer->Render("employee/edit", compact('employee', 'departements'));
+        return $this->renderer->render("employee/edit", compact('employee', 'departements'));
     }
 
     public function edit(): Response
     {
-        list($employee, $redirectUrl) = $this->createEmployeeFromInput();
+        $employee = $this->createEmployeeFromInput();
 
          if (!$employee) {
-            return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+            return $this->redirectWithError(
+                $this->getIndexRoute(),
+                "Merci de bien remplir le formulaire");
         }
 
         $this->model->update($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            $this->getIndexRoute(),
             "Employé modifié avec succès"
         );
     }
 
-    public function delete(): Response
+    public function delete(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        if (!$id or !is_int($id)) {
-            return $this->redirectWithError(
-                "/mvc-employees/employee/index",
-                "Merci de renseigner un id"
-            );
-        }
-        $model = $this->model;
-        $employee = $model->findById($id);
+        $id =  $id = $request->get('id');
+
+        $employee = $this->model->findById($id);
         if (!$employee) {
             return $this->redirectWithError(
-                "/mvc-employees/employee/index",
+                $this->getIndexRoute(),
                 "Vous essayez de supprimer un employé qui n'existe pas !"
             );
         }
-        $model->deleteById($employee);
+        $this->model->deleteById($employee);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/employee/index",
+            $this->getIndexRoute(),
             "Employé supprimé avec succès"
         );
     }
 
-    private function createEmployeeFromInput(): array
+    private function createEmployeeFromInput(): ?Employee
         {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $lastName = filter_input(INPUT_POST, 'lastName', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -174,8 +161,7 @@ class EmployeeController extends BaseController
         $departementId = filter_input(INPUT_POST, 'departementId', FILTER_SANITIZE_SPECIAL_CHARS);
 
         if (!$lastName || !$firstName || !$birthDate || !$hireDate || !$salary || !$departementId) {
-            $redirectUrl = $id ? "/mvc-employees/employee/editView/$id" : "/mvc-employees/employee/newView";
-            return [null, $redirectUrl];
+            return [null];
         }
 
         $employee = new Employee([
@@ -188,7 +174,7 @@ class EmployeeController extends BaseController
             'departementId' => $departementId
         ]);
 
-        return [$employee, null];
+        return $employee;
     }
 }
 

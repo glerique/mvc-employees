@@ -21,33 +21,33 @@
                     <tbody>
                         {% for employee in employees %}
                             <tr>
-                                <td><a href="/mvc-employees/employee/show/{{ employee.getId() }}">{{ employee.getId() }}</a></td>
+                                <td><a href="{{ path('employee_show', { 'id': employee.getId() }) }}">{{ employee.getId() }}</a></td>
                                 <td>{{ employee.getLastName() }}</td>
                                 <td>{{ employee.getFirstName() }}</td>
                                 <td>{{ employee.getBirthDate()|date('d-m-Y') }}</td>
                                 <td>{{ employee.getHireDate()|date('d-m-Y') }}</td>
                                 <td>{{ employee.getSalary() }}</td>
                                 <td>{{ employee.getDepartement() }}</td>
-                                <td><a href="/mvc-employees/employee/editView/{{ employee.getId() }}">Modifier</a></td>
-                                <td><a href="/mvc-employees/employee/delete/{{ employee.getId() }}">Supprimer</a></td>
+                                <td><a href="{{ path('employee_editView', { 'id': employee.getId() }) }}">Modifier</a></td>
+                                <td><a href="{{ path('employee_delete', { 'id': employee.getId() }) }}">Supprimer</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
                 <nav>
                     <ul class="pagination">
-                        <li class="page-item {{ currentPage == 1 ? 'disabled' : '' }}">
-                            <a href="/mvc-employees/employee/index/{{ currentPage - 1 }}" class="page-link">Précédente</a>
+                        <li class="page-item {{ currentPage <= 1 ? 'disabled' : '' }}">
+                            <a href="{{ path('employee_index', { 'nb': max(currentPage - 1, 1) - 1 }) }}" class="page-link">Précédente</a>
                         </li>
 
                         {% for page in 1..pages %}
                             <li class="page-item {{ currentPage == page ? 'active' : '' }}">
-                                <a href="/mvc-employees/employee/index/{{ page }}" class="page-link">{{ page }}</a>
+                                <a href="{{ path('employee_index', { 'nb': page }) }}" class="page-link">{{ page }}</a>
                             </li>
                         {% endfor %}
 
                         <li class="page-item {{ currentPage == pages ? 'disabled' : '' }}">
-                            <a href="/mvc-employees/employee/index/{{ currentPage + 1 }}" class="page-link">Suivante</a>
+                            <a href="{{ path('employee_index', { 'nb': currentPage + 1 }) }}" class="page-link">Suivante</a>
                         </li>
                     </ul>
                 </nav>

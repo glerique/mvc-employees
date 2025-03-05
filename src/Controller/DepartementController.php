@@ -4,22 +4,26 @@ namespace App\Controller;
 
 use App\Lib\Renderer;
 use App\Lib\Redirector;
-use App\Lib\QueryBuilder;
 use App\Entity\Departement;
 use App\Lib\SessionManager;
 use App\Model\DepartementModel;
 use App\Controller\BaseController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 
 class DepartementController extends BaseController
 {
+    protected const DEFAULT_ROUTE = 'departement_index';
+
     public function __construct(
         private readonly DepartementModel $model,
         SessionManager $sessionManager,
         Redirector $redirector,
         Renderer $renderer,
-    ){
-        parent::__construct($sessionManager, $redirector, $renderer);
+        RouterInterface $router,
+    ) {
+        parent::__construct($sessionManager, $redirector, $renderer, $router);
     }
 
     public function index(): Response
@@ -32,21 +36,14 @@ class DepartementController extends BaseController
         ]);
     }
 
-    public function show(): Response
+    public function show(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-
-        if (!$id) {
-            $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Merci de renseigner un id"
-            );
-        }
+        $id = $request->get('id');
         $departement = $this->model->findById($id);
         if (!$departement) {
-            $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Vous essayé de consulter un service qui n'existe pas !"
+            return $this->redirectWithError(
+                $this->getIndexRoute(),
+                "Vous essayez de consulter un service qui n'existe pas !"
             );
         }
         return $this->renderer->render("departement/show", compact('departement'));
@@ -59,88 +56,82 @@ class DepartementController extends BaseController
 
     public function new(): Response
     {
-        list($departement, $redirectUrl) = $this->createDepartementFromInput();
-         if (!$departement) {
-            $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+        $departement = $this->createDepartementFromInput();
+
+        if (!$departement) {
+            return $this->redirectWithError(
+                $this->getIndexRoute(),
+                "Merci de bien remplir le formulaire"
+            );
         }
 
         $this->model->add($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            $this->getIndexRoute(),
             "Service ajouté avec succès"
         );
     }
 
-    public function editView(): Response
+    public function editView(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        if (!$id or !is_int($id)) {
-            return $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Merci de renseigner un id"
-            );
-        }
+        $id = $request->get('id');
 
         $departement = $this->model->findById($id);
         if (!$departement) {
             return $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Vous essayé de modifier un service qui n'existe pas !"
+                $this->getIndexRoute(),
+                "Vous essayez de modifier un service qui n'existe pas !"
             );
         }
-        return $this->renderer->Render("departement/edit", compact('departement'));
+        return $this->renderer->render("departement/edit", compact('departement'));
     }
 
     public function edit(): Response
     {
-        list($departement, $redirectUrl) = $this->createDepartementFromInput();
+        $departement = $this->createDepartementFromInput();
 
-         if (!$departement) {
-           return $this->redirectWithError($redirectUrl, "Merci de bien remplir le formulaire");
+        if (!$departement) {
+            return $this->redirectWithError(
+                $this->getIndexRoute(),
+                "Merci de bien remplir le formulaire"
+            );
         }
 
         $this->model->update($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            $this->getIndexRoute(),
             "Service modifié avec succès"
         );
     }
 
-    public function delete(): Response
+    public function delete(Request $request): Response
     {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        if (!$id) {
-            return $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Merci de renseigner un id"
-            );
-        }
+        $id = $request->get('id');
 
-        $model = $this->model;
-        $departement = $model->findById($id);
+        $departement = $this->model->findById($id);
         if (!$departement) {
             return $this->redirectWithError(
-                "/mvc-employees/departement/index",
-                "Vous essayé de supprimer un service qui n'existe pas !"
+                $this->getIndexRoute(),
+                "Vous essayez de supprimer un service qui n'existe pas !"
             );
         }
-        $model->deleteById($departement);
+        $this->model->deleteById($departement);
 
         return $this->redirectWithSuccess(
-            "/mvc-employees/departement/index",
+            $this->getIndexRoute(),
             "Service supprimé avec succès"
         );
     }
 
-    private function createDepartementFromInput(): array
+    private function createDepartementFromInput(): ?Departement
     {
         $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+
         if (!$name) {
-            $redirectUrl = $id ? "/mvc-employees/departement/editView/$id" : "/mvc-employees/departement/newView";
-            return [null, $redirectUrl];
+            return null;
         }
 
         $departement =  new Departement([
@@ -148,7 +139,6 @@ class DepartementController extends BaseController
             'name' => $name
         ]);
 
-        return [$departement,null];
+        return $departement;
     }
 }
-
